@@ -51,8 +51,6 @@ docker-compose up --build
 4. **Access Points:**
    - **🌐 Web Interface**: http://localhost:8080
    - **📚 API Documentation**: http://localhost:8080/swagger
-   - **🔗 API Base URL**: http://localhost:8080/api
-   - **🗄️ Database**: localhost:1433 (sa/YourStrong@Passw0rd)
 
 ### 💻 Running Locally (without Docker)
 

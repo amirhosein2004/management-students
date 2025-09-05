@@ -59,6 +59,13 @@ namespace StudentManagementAPI.DTOs
         
         [StringLength(50)]
         public string Major { get; set; }
+        
+        [Required]
+        [StringLength(20)]
+        public string StudentNumber { get; set; }
+        
+        [Required]
+        public int EnrollmentYear { get; set; }
     }
     
     // کلاس مورد نیاز برای View ها
@@ -114,6 +121,11 @@ namespace StudentManagementAPI.DTOs
         
         [StringLength(50)]
         public string Major { get; set; }
+        
+        [StringLength(20)]
+        public string StudentNumber { get; set; }
+        
+        public int? EnrollmentYear { get; set; }
     }
     
     // کلاس مورد نیاز برای View ها

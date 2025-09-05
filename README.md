@@ -45,7 +45,7 @@ StudentManagementAPI/
 3. Run the following command:
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 
 4. **Access Points:**
@@ -67,9 +67,9 @@ dotnet run
 ```
 
 5. **Access Points:**
-   - **🌐 Web Interface**: https://localhost:5001
-   - **📚 API Documentation**: https://localhost:5001/swagger
-   - **🔗 API Base URL**: https://localhost:5001/api
+   - **🌐 Web Interface**: http://localhost:8080/
+   - **📚 API Documentation**: http://localhost:8080/swagger
+   - **🔗 API Base URL**: http://localhost:8080/api
 
 ## 🔗 API Endpoints
 

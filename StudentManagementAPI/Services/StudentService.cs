@@ -36,37 +36,117 @@ namespace StudentManagementAPI.Services
 
         public async Task<StudentDTO> CreateStudentAsync(CreateStudentDTO createStudentDto)
         {
-            var student = _mapper.Map<Student>(createStudentDto);
-            await _studentRepository.CreateStudentAsync(student);
-            return _mapper.Map<StudentDTO>(student);
+            try
+            {
+                var student = _mapper.Map<Student>(createStudentDto);
+                
+                // StudentNumber and EnrollmentYear are now provided by the user input
+                // No need to auto-generate them
+                
+                // Ensure all required fields are set
+                if (string.IsNullOrEmpty(student.FirstName))
+                    throw new ArgumentException("FirstName is required");
+                if (string.IsNullOrEmpty(student.LastName))
+                    throw new ArgumentException("LastName is required");
+                if (string.IsNullOrEmpty(student.Email))
+                    throw new ArgumentException("Email is required");
+                if (string.IsNullOrEmpty(student.PhoneNumber))
+                    throw new ArgumentException("PhoneNumber is required");
+                if (string.IsNullOrEmpty(student.Major))
+                    throw new ArgumentException("Major is required");
+                if (string.IsNullOrEmpty(student.StudentNumber))
+                    throw new ArgumentException("StudentNumber is required");
+                if (student.EnrollmentYear == 0)
+                    throw new ArgumentException("EnrollmentYear is required");
+                
+                Console.WriteLine($"Creating student: {student.FirstName} {student.LastName}, StudentNumber: {student.StudentNumber}, EnrollmentYear: {student.EnrollmentYear}");
+                
+                await _studentRepository.CreateStudentAsync(student);
+                return _mapper.Map<StudentDTO>(student);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreateStudentAsync: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        private async Task<string> GenerateStudentNumberAsync()
+        {
+            // Generate a unique student number based on current year and random number
+            var year = DateTime.Now.Year.ToString().Substring(2); // Last 2 digits of year
+            
+            string studentNumber;
+            bool isUnique;
+            
+            do
+            {
+                var random = new Random().Next(10000, 99999);
+                studentNumber = $"{year}{random}";
+                
+                // Check if this student number already exists
+                var existingStudent = await _studentRepository.GetAllStudentsAsync();
+                isUnique = !existingStudent.Any(s => s.StudentNumber == studentNumber);
+            } while (!isUnique);
+            
+            return studentNumber;
         }
 
         public async Task<StudentDTO> UpdateStudentAsync(int id, UpdateStudentDTO updateStudentDto)
         {
-            var existingStudent = await _studentRepository.GetStudentByIdAsync(id);
-            if (existingStudent == null)
-                return null;
+            try
+            {
+                var existingStudent = await _studentRepository.GetStudentByIdAsync(id);
+                if (existingStudent == null)
+                    return null;
 
-            // Update only the properties that are provided in the DTO
-            if (updateStudentDto.FirstName != null)
-                existingStudent.FirstName = updateStudentDto.FirstName;
-            if (updateStudentDto.LastName != null)
-                existingStudent.LastName = updateStudentDto.LastName;
-            if (updateStudentDto.Email != null)
-                existingStudent.Email = updateStudentDto.Email;
-            if (updateStudentDto.PhoneNumber != null)
-                existingStudent.PhoneNumber = updateStudentDto.PhoneNumber;
-            if (updateStudentDto.DateOfBirth.HasValue)
-                existingStudent.DateOfBirth = updateStudentDto.DateOfBirth.Value;
-            if (updateStudentDto.Address != null)
-                existingStudent.Address = updateStudentDto.Address;
-            if (updateStudentDto.EnrollmentDate.HasValue)
-                existingStudent.EnrollmentDate = updateStudentDto.EnrollmentDate.Value;
-            if (updateStudentDto.Major != null)
-                existingStudent.Major = updateStudentDto.Major;
+                Console.WriteLine($"Updating student ID: {id}");
+                Console.WriteLine($"Current StudentNumber: {existingStudent.StudentNumber}, New: {updateStudentDto.StudentNumber}");
+                Console.WriteLine($"Current EnrollmentYear: {existingStudent.EnrollmentYear}, New: {updateStudentDto.EnrollmentYear}");
 
-            await _studentRepository.UpdateStudentAsync(existingStudent);
-            return _mapper.Map<StudentDTO>(existingStudent);
+                // Update only the properties that are provided in the DTO
+                if (updateStudentDto.FirstName != null)
+                    existingStudent.FirstName = updateStudentDto.FirstName;
+                if (updateStudentDto.LastName != null)
+                    existingStudent.LastName = updateStudentDto.LastName;
+                if (updateStudentDto.Email != null)
+                    existingStudent.Email = updateStudentDto.Email;
+                if (updateStudentDto.PhoneNumber != null)
+                    existingStudent.PhoneNumber = updateStudentDto.PhoneNumber;
+                if (updateStudentDto.DateOfBirth.HasValue)
+                    existingStudent.DateOfBirth = updateStudentDto.DateOfBirth.Value;
+                if (updateStudentDto.Address != null)
+                    existingStudent.Address = updateStudentDto.Address;
+                if (updateStudentDto.EnrollmentDate.HasValue)
+                    existingStudent.EnrollmentDate = updateStudentDto.EnrollmentDate.Value;
+                if (updateStudentDto.Major != null)
+                    existingStudent.Major = updateStudentDto.Major;
+                if (!string.IsNullOrEmpty(updateStudentDto.StudentNumber))
+                {
+                    Console.WriteLine($"Updating StudentNumber from {existingStudent.StudentNumber} to {updateStudentDto.StudentNumber}");
+                    existingStudent.StudentNumber = updateStudentDto.StudentNumber;
+                }
+                if (updateStudentDto.EnrollmentYear.HasValue)
+                {
+                    Console.WriteLine($"Updating EnrollmentYear from {existingStudent.EnrollmentYear} to {updateStudentDto.EnrollmentYear.Value}");
+                    existingStudent.EnrollmentYear = updateStudentDto.EnrollmentYear.Value;
+                }
+
+                await _studentRepository.UpdateStudentAsync(existingStudent);
+                
+                Console.WriteLine($"Student updated successfully. Final StudentNumber: {existingStudent.StudentNumber}, Final EnrollmentYear: {existingStudent.EnrollmentYear}");
+                
+                return _mapper.Map<StudentDTO>(existingStudent);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateStudentAsync: {ex.Message}");
+                Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         public async Task<IEnumerable<StudentDTO>> GetStudentsAsync(string searchTerm = null, string major = null)

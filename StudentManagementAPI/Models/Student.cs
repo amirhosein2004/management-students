@@ -33,11 +33,9 @@ namespace StudentManagementAPI.Models
         [Required]
         public DateTime EnrollmentDate { get; set; }
         
-        [Required]
         [StringLength(20)]
         public string StudentNumber { get; set; }
         
-        [Required]
         public int EnrollmentYear { get; set; }
         
         [StringLength(50)]

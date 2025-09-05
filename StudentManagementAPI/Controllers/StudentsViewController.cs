@@ -73,7 +73,7 @@ namespace StudentManagementAPI.Controllers
                 {
                     // بررسی تکراری نبودن شماره دانشجویی
                     var existingStudents = await _studentService.GetAllStudentsAsync();
-                    if (existingStudents.Any(s => s.Id.ToString() == studentDto.StudentNumber))
+                    if (existingStudents.Any(s => s.StudentNumber == studentDto.StudentNumber))
                     {
                         ModelState.AddModelError("StudentNumber", "این شماره دانشجویی قبلاً ثبت شده است");
                         return View(studentDto);
@@ -85,6 +85,8 @@ namespace StudentManagementAPI.Controllers
                         FirstName = studentDto.FirstName,
                         LastName = studentDto.LastName,
                         Major = studentDto.Major,
+                        StudentNumber = studentDto.StudentNumber,
+                        EnrollmentYear = studentDto.EnrollmentYear,
                         Email = $"{studentDto.FirstName.ToLower()}.{studentDto.LastName.ToLower()}@university.edu",
                         PhoneNumber = "000-000-0000",
                         DateOfBirth = DateTime.Now.AddYears(-20),
@@ -98,7 +100,15 @@ namespace StudentManagementAPI.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "خطا در ثبت دانشجو: " + ex.Message);
+                    // Log the full exception details for debugging
+                    var innerException = ex.InnerException?.Message ?? "No inner exception";
+                    var stackTrace = ex.StackTrace ?? "No stack trace";
+                    var fullError = $"خطا در ثبت دانشجو: {ex.Message}\nجزئیات: {innerException}\nStack Trace: {stackTrace}";
+                    
+                    // Log to console for debugging
+                    Console.WriteLine($"CREATE STUDENT ERROR: {fullError}");
+                    
+                    ModelState.AddModelError("", $"خطا در ثبت دانشجو: {ex.Message}. جزئیات: {innerException}");
                 }
             }
             return View(studentDto);
@@ -132,7 +142,7 @@ namespace StudentManagementAPI.Controllers
                 {
                     // بررسی تکراری نبودن شماره دانشجویی (به جز دانشجوی فعلی)
                     var existingStudents = await _studentService.GetAllStudentsAsync();
-                    var duplicateStudent = existingStudents.FirstOrDefault(s => s.Id.ToString() == studentDto.StudentNumber && s.Id != id);
+                    var duplicateStudent = existingStudents.FirstOrDefault(s => s.StudentNumber == studentDto.StudentNumber && s.Id != id);
                     if (duplicateStudent != null)
                     {
                         ModelState.AddModelError("StudentNumber", "این شماره دانشجویی قبلاً ثبت شده است");
@@ -144,6 +154,8 @@ namespace StudentManagementAPI.Controllers
                     {
                         FirstName = studentDto.FirstName,
                         LastName = studentDto.LastName,
+                        StudentNumber = studentDto.StudentNumber,
+                        EnrollmentYear = studentDto.EnrollmentYear,
                         Major = studentDto.Major,
                         Email = $"{studentDto.FirstName.ToLower()}.{studentDto.LastName.ToLower()}@university.edu",
                         PhoneNumber = "000-000-0000"
@@ -155,7 +167,15 @@ namespace StudentManagementAPI.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "خطا در به‌روزرسانی دانشجو: " + ex.Message);
+                    // Log the full exception details for debugging
+                    var innerException = ex.InnerException?.Message ?? "No inner exception";
+                    var stackTrace = ex.StackTrace ?? "No stack trace";
+                    var fullError = $"خطا در به‌روزرسانی دانشجو: {ex.Message}\nجزئیات: {innerException}\nStack Trace: {stackTrace}";
+                    
+                    // Log to console for debugging
+                    Console.WriteLine($"UPDATE STUDENT ERROR: {fullError}");
+                    
+                    ModelState.AddModelError("", $"خطا در به‌روزرسانی دانشجو: {ex.Message}. جزئیات: {innerException}");
                 }
             }
             return View(studentDto);

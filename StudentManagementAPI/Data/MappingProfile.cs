@@ -12,14 +12,10 @@ namespace StudentManagementAPI.Data
             CreateMap<Student, StudentDTO>();
             
             // Map from CreateStudentDTO to Student
-            CreateMap<CreateStudentDTO, Student>()
-                .ForMember(dest => dest.StudentNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.EnrollmentYear, opt => opt.Ignore());
+            CreateMap<CreateStudentDTO, Student>();
             
             // Map from UpdateStudentDTO to Student
-            CreateMap<UpdateStudentDTO, Student>()
-                .ForMember(dest => dest.StudentNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.EnrollmentYear, opt => opt.Ignore());
+            CreateMap<UpdateStudentDTO, Student>();
             
             // Map from StudentDTO to StudentDto (for views)
             CreateMap<StudentDTO, StudentDto>()

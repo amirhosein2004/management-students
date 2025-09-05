@@ -1,0 +1,200 @@
+@{
+    ViewData["Title"] = "وارد کردن گروهی دانشجویان";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-3">
+            <i class="fas fa-file-import text-primary"></i>
+            وارد کردن گروهی دانشجویان
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "StudentsView")">مدیریت دانشجویان</a></li>
+                <li class="breadcrumb-item active" aria-current="page">وارد کردن گروهی</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-upload me-2"></i>
+                    آپلود فایل اکسل
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="BulkImport" method="post" enctype="multipart/form-data" id="importForm">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">
+                            <i class="fas fa-file-excel me-1"></i>
+                            انتخاب فایل اکسل
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls" required>
+                        <div class="form-text">
+                            فقط فایل‌های اکسل (.xlsx, .xls) پشتیبانی می‌شوند. حداکثر اندازه فایل: 10 مگابایت
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-success btn-lg me-md-2" id="submitBtn">
+                            <i class="fas fa-upload me-2"></i>
+                            <span id="submitText">شروع وارد کردن</span>
+                            <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            بازگشت به لیست
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    راهنمای استفاده
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold">فرمت فایل اکسل:</h6>
+                <p class="small mb-3">فایل اکسل باید دارای ستون‌های زیر باشد:</p>
+                
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ستون</th>
+                            <th>عنوان</th>
+                            <th>الزامی</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>A</td>
+                            <td>نام</td>
+                            <td><span class="badge bg-danger">بله</span></td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>نام خانوادگی</td>
+                            <td><span class="badge bg-danger">بله</span></td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td>شماره دانشجویی</td>
+                            <td><span class="badge bg-danger">بله</span></td>
+                        </tr>
+                        <tr>
+                            <td>D</td>
+                            <td>رشته تحصیلی</td>
+                            <td><span class="badge bg-danger">بله</span></td>
+                        </tr>
+                        <tr>
+                            <td>E</td>
+                            <td>سال ورود</td>
+                            <td><span class="badge bg-danger">بله</span></td>
+                        </tr>
+                        <tr>
+                            <td>F</td>
+                            <td>ایمیل</td>
+                            <td><span class="badge bg-secondary">خیر</span></td>
+                        </tr>
+                        <tr>
+                            <td>G</td>
+                            <td>تلفن</td>
+                            <td><span class="badge bg-secondary">خیر</span></td>
+                        </tr>
+                        <tr>
+                            <td>H</td>
+                            <td>آدرس</td>
+                            <td><span class="badge bg-secondary">خیر</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-warning small" role="alert">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    <strong>توجه:</strong> ردیف اول فایل باید شامل عناوین ستون‌ها باشد و از ردیف دوم داده‌ها شروع شود.
+                </div>
+
+                <div class="mt-3">
+                    <a href="#" class="btn btn-outline-primary btn-sm" onclick="downloadTemplate()">
+                        <i class="fas fa-download me-1"></i>
+                        دانلود فایل نمونه
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    نکات مهم
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>شماره دانشجویی باید منحصر به فرد باشد</li>
+                    <li>سال ورود باید بین 1300 تا 1450 باشد</li>
+                    <li>نام و نام خانوادگی حداقل 2 کاراکتر داشته باشند</li>
+                    <li>شماره دانشجویی فقط شامل اعداد باشد</li>
+                    <li>در صورت خالی بودن فیلدهای اختیاری، مقادیر پیش‌فرض تنظیم می‌شود</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('importForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    submitBtn.disabled = true;
+    submitText.textContent = 'در حال پردازش...';
+    loadingSpinner.classList.remove('d-none');
+});
+
+function downloadTemplate() {
+    // Create a simple Excel template
+    const data = [
+        ['نام', 'نام خانوادگی', 'شماره دانشجویی', 'رشته تحصیلی', 'سال ورود', 'ایمیل', 'تلفن', 'آدرس'],
+        ['علی', 'احمدی', '9912345678', 'مهندسی کامپیوتر', '1402', 'ali.ahmadi@university.edu', '09123456789', 'تهران'],
+        ['فاطمه', 'محمدی', '9912345679', 'مهندسی برق', '1402', 'fateme.mohammadi@university.edu', '09123456790', 'اصفهان']
+    ];
+    
+    let csvContent = '\uFEFF'; // BOM for UTF-8
+    data.forEach(row => {
+        csvContent += row.join(',') + '\n';
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'student_import_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>

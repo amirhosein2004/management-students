@@ -1,0 +1,118 @@
+@{
+    ViewData["Title"] = "صفحه اصلی";
+}
+
+<div class="jumbotron bg-primary text-white text-center py-5 mb-4">
+    <div class="container">
+        <h1 class="display-4 mb-3">
+            <i class="fas fa-graduation-cap me-3"></i>
+            سیستم مدیریت دانشجویان
+        </h1>
+        <p class="lead mb-4">سامانه جامع مدیریت اطلاعات دانشجویان با امکانات پیشرفته</p>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <a href="@Url.Action("Index", "Dashboard")" class="btn btn-light btn-lg w-100">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    مشاهده داشبورد
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="@Url.Action("Index", "StudentsView")" class="btn btn-outline-light btn-lg w-100">
+                    <i class="fas fa-users me-2"></i>
+                    مدیریت دانشجویان
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="/swagger" target="_blank" class="btn btn-outline-light btn-lg w-100">
+                    <i class="fas fa-code me-2"></i>
+                    مستندات API
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                    <i class="fas fa-search fa-2x"></i>
+                </div>
+                <h5 class="card-title">جستجو و فیلتر پیشرفته</h5>
+                <p class="card-text">امکان جستجو و فیلتر دانشجویان بر اساس نام، رشته تحصیلی و سایر معیارها</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-success bg-gradient text-white rounded-3 mb-3">
+                    <i class="fas fa-chart-pie fa-2x"></i>
+                </div>
+                <h5 class="card-title">گزارش‌گیری و آمار</h5>
+                <p class="card-text">داشبورد تحلیلی با نمودارها و آمار کامل از وضعیت دانشجویان</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="feature-icon bg-info bg-gradient text-white rounded-3 mb-3">
+                    <i class="fas fa-mobile-alt fa-2x"></i>
+                </div>
+                <h5 class="card-title">طراحی ریسپانسیو</h5>
+                <p class="card-text">سازگار با تمامی دستگاه‌ها و مرورگرها با رابط کاربری مدرن</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    درباره سیستم
+                </h5>
+                <p class="card-text">
+                    این سیستم با استفاده از تکنولوژی‌های مدرن ASP.NET Core، Entity Framework و SQL Server طراحی شده است.
+                    امکانات شامل مدیریت کامل دانشجویان، صفحه‌بندی، جستجو، فیلتر و گزارش‌گیری می‌باشد.
+                </p>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <i class="fab fa-microsoft fa-2x text-primary mb-2"></i>
+                        <p class="small">ASP.NET Core 8</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fas fa-database fa-2x text-success mb-2"></i>
+                        <p class="small">SQL Server 2022</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fab fa-docker fa-2x text-info mb-2"></i>
+                        <p class="small">Docker Support</p>
+                    </div>
+                    <div class="col-md-3">
+                        <i class="fab fa-bootstrap fa-2x text-purple mb-2"></i>
+                        <p class="small">Bootstrap 5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    margin: 0 auto;
+}
+.jumbotron {
+    border-radius: 0.5rem;
+}
+</style>

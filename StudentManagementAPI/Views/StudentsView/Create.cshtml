@@ -1,0 +1,135 @@
+@model StudentManagementAPI.DTOs.StudentCreateDto
+
+@{
+    ViewData["Title"] = "افزودن دانشجوی جدید";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-3">
+            <i class="fas fa-user-plus text-primary"></i>
+            افزودن دانشجوی جدید
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "StudentsView")">مدیریت دانشجویان</a></li>
+                <li class="breadcrumb-item active" aria-current="page">افزودن دانشجو</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    اطلاعات دانشجو
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" id="studentForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="FirstName" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    @Html.DisplayNameFor(model => model.FirstName)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FirstName" class="form-control" placeholder="نام دانشجو را وارد کنید" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="LastName" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    @Html.DisplayNameFor(model => model.LastName)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="LastName" class="form-control" placeholder="نام خانوادگی را وارد کنید" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="StudentNumber" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    @Html.DisplayNameFor(model => model.StudentNumber)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="StudentNumber" class="form-control" placeholder="مثال: 9912345678" />
+                                <span asp-validation-for="StudentNumber" class="text-danger"></span>
+                                <div class="form-text">شماره دانشجویی باید فقط شامل اعداد باشد</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="EnrollmentYear" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    @Html.DisplayNameFor(model => model.EnrollmentYear)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="EnrollmentYear" class="form-control" placeholder="مثال: 1402" />
+                                <span asp-validation-for="EnrollmentYear" class="text-danger"></span>
+                                <div class="form-text">سال ورود به صورت شمسی</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="Major" class="form-label">
+                                    <i class="fas fa-graduation-cap me-1"></i>
+                                    @Html.DisplayNameFor(model => model.Major)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Major" class="form-select">
+                                    <option value="">رشته تحصیلی را انتخاب کنید</option>
+                                    <option value="مهندسی کامپیوتر">مهندسی کامپیوتر</option>
+                                    <option value="مهندسی برق">مهندسی برق</option>
+                                    <option value="مهندسی مکانیک">مهندسی مکانیک</option>
+                                    <option value="مهندسی عمران">مهندسی عمران</option>
+                                    <option value="مهندسی شیمی">مهندسی شیمی</option>
+                                    <option value="ریاضی">ریاضی</option>
+                                    <option value="فیزیک">فیزیک</option>
+                                    <option value="شیمی">شیمی</option>
+                                    <option value="زیست‌شناسی">زیست‌شناسی</option>
+                                    <option value="اقتصاد">اقتصاد</option>
+                                    <option value="مدیریت">مدیریت</option>
+                                    <option value="حسابداری">حسابداری</option>
+                                </select>
+                                <span asp-validation-for="Major" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary btn-lg me-md-2">
+                                <i class="fas fa-save me-2"></i>
+                                ذخیره دانشجو
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                بازگشت به لیست
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

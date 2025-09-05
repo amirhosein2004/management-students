@@ -1,0 +1,76 @@
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+// Persian validation messages
+$.extend($.validator.messages, {
+    required: "این فیلد الزامی است",
+    remote: "لطفاً این فیلد را تصحیح کنید",
+    email: "لطفاً یک آدرس ایمیل معتبر وارد کنید",
+    url: "لطفاً یک URL معتبر وارد کنید",
+    date: "لطفاً یک تاریخ معتبر وارد کنید",
+    dateISO: "لطفاً یک تاریخ معتبر (ISO) وارد کنید",
+    number: "لطفاً یک عدد معتبر وارد کنید",
+    digits: "لطفاً فقط اعداد وارد کنید",
+    creditcard: "لطفاً یک شماره کارت اعتباری معتبر وارد کنید",
+    equalTo: "لطفاً همان مقدار را دوباره وارد کنید",
+    maxlength: $.validator.format("لطفاً حداکثر {0} کاراکتر وارد کنید"),
+    minlength: $.validator.format("لطفاً حداقل {0} کاراکتر وارد کنید"),
+    rangelength: $.validator.format("لطفاً بین {0} تا {1} کاراکتر وارد کنید"),
+    range: $.validator.format("لطفاً عددی بین {0} تا {1} وارد کنید"),
+    max: $.validator.format("لطفاً عددی کمتر یا مساوی {0} وارد کنید"),
+    min: $.validator.format("لطفاً عددی بیشتر یا مساوی {0} وارد کنید")
+});
+
+// Real-time validation styling
+$(document).ready(function() {
+    $('form').each(function() {
+        $(this).find('input, select, textarea').on('blur keyup', function() {
+            var $this = $(this);
+            var $formGroup = $this.closest('.form-group, .mb-3');
+            
+            if ($this.valid()) {
+                $formGroup.removeClass('has-error');
+                $this.removeClass('is-invalid').addClass('is-valid');
+            } else {
+                $formGroup.addClass('has-error');
+                $this.removeClass('is-valid').addClass('is-invalid');
+            }
+        });
+    });
+    
+    // Form submission validation
+    $('form').on('submit', function(e) {
+        var $form = $(this);
+        if (!$form.valid()) {
+            e.preventDefault();
+            
+            // Focus on first invalid field
+            var $firstInvalid = $form.find('.is-invalid, .input-validation-error').first();
+            if ($firstInvalid.length) {
+                $firstInvalid.focus();
+                
+                // Scroll to the field
+                $('html, body').animate({
+                    scrollTop: $firstInvalid.offset().top - 100
+                }, 500);
+            }
+            
+            // Show error message
+            var errorCount = $form.find('.is-invalid, .input-validation-error').length;
+            if (errorCount > 0) {
+                var message = 'لطفاً ' + errorCount + ' خطای موجود در فرم را تصحیح کنید';
+                if ($('.alert-validation-summary').length === 0) {
+                    $form.prepend('<div class="alert alert-danger alert-validation-summary alert-dismissible fade show" role="alert">' +
+                        '<i class="fas fa-exclamation-triangle me-2"></i>' + message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>');
+                }
+            }
+        } else {
+            // Remove validation summary if form is valid
+            $('.alert-validation-summary').remove();
+        }
+    });
+});
+</script>

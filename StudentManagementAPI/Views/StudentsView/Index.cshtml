@@ -1,0 +1,388 @@
+@model IEnumerable<StudentManagementAPI.DTOs.StudentDto>
+
+@{
+    ViewData["Title"] = "مدیریت دانشجویان";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h1>لیست دانشجویان</h1>
+
+<!-- Search and Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="searchTerm" class="form-label">جستجو</label>
+                <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                       value="@ViewBag.CurrentSearch" placeholder="نام، نام خانوادگی یا ایمیل">
+            </div>
+            <div class="col-md-3">
+                <label for="major" class="form-label">رشته تحصیلی</label>
+                <select class="form-select" id="major" name="major">
+                    <option value="">همه رشته‌ها</option>
+                    @foreach (var majorOption in ViewBag.Majors)
+                    {
+                        <option value="@majorOption" selected="@(majorOption == ViewBag.CurrentMajor)">@majorOption</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> جستجو
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-grid">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> پاک کردن
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a asp-action="Create" class="btn btn-success me-2">
+            <i class="fas fa-plus"></i> افزودن دانشجوی جدید
+        </a>
+        <a asp-action="BulkImport" class="btn btn-info me-2">
+            <i class="fas fa-file-import"></i> وارد کردن گروهی
+        </a>
+        <div class="btn-group me-2" role="group">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-download"></i> خروجی گرفتن
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("ExportToExcel", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor })">
+                        <i class="fas fa-file-excel text-success me-2"></i>
+                        خروجی اکسل
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("ExportToPdf", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor })">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>
+                        خروجی PDF
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <button type="button" class="btn btn-outline-danger" id="bulkDeleteBtn" onclick="toggleBulkDelete()" style="display: none;">
+            <i class="fas fa-trash"></i> حذف انتخاب شده‌ها
+        </button>
+    </div>
+    <div class="text-muted">
+        @{
+            var paginationInfo = ViewBag.PaginationInfo as StudentManagementAPI.DTOs.PaginatedResult<StudentManagementAPI.DTOs.StudentDTO>;
+        }
+        نمایش @((paginationInfo.PageNumber - 1) * paginationInfo.PageSize + 1) تا @(Math.Min(paginationInfo.PageNumber * paginationInfo.PageSize, paginationInfo.TotalCount)) از @paginationInfo.TotalCount دانشجو
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" style="display: none;">
+                    <label for="selectAll" id="selectAllLabel" style="display: none;">انتخاب همه</label>
+                    <span id="normalHeader">شناسه</span>
+                </th>
+                <th>نام</th>
+                <th>نام خانوادگی</th>
+                <th>شماره دانشجویی</th>
+                <th>رشته تحصیلی</th>
+                <th>سال ورود</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="student-checkbox" value="@item.Id" onchange="updateBulkDeleteButton()" style="display: none;">
+                        <span class="student-id">@item.Id</span>
+                    </td>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.StudentNumber</td>
+                    <td>@item.Major</td>
+                    <td>@item.EnrollmentYear</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> ویرایش
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> جزئیات
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> حذف
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+@if (paginationInfo.TotalPages > 1)
+{
+    <nav aria-label="صفحه‌بندی دانشجویان">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Page -->
+            @if (paginationInfo.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = paginationInfo.PageNumber - 1, pageSize = paginationInfo.PageSize })">
+                        <i class="fas fa-chevron-right"></i> قبلی
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i> قبلی</span>
+                </li>
+            }
+
+            <!-- Page Numbers -->
+            @{
+                int startPage = Math.Max(1, paginationInfo.PageNumber - 2);
+                int endPage = Math.Min(paginationInfo.TotalPages, paginationInfo.PageNumber + 2);
+            }
+
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = 1, pageSize = paginationInfo.PageSize })">1</a>
+                </li>
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == paginationInfo.PageNumber ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = i, pageSize = paginationInfo.PageSize })">@i</a>
+                </li>
+            }
+
+            @if (endPage < paginationInfo.TotalPages)
+            {
+                @if (endPage < paginationInfo.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = paginationInfo.TotalPages, pageSize = paginationInfo.PageSize })">@paginationInfo.TotalPages</a>
+                </li>
+            }
+
+            <!-- Next Page -->
+            @if (paginationInfo.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = paginationInfo.PageNumber + 1, pageSize = paginationInfo.PageSize })">
+                        بعدی <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">بعدی <i class="fas fa-chevron-left"></i></span>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    <!-- Page Size Selector -->
+    <div class="d-flex justify-content-center mt-3">
+        <div class="btn-group" role="group">
+            <span class="btn btn-outline-secondary disabled">تعداد در صفحه:</span>
+            @foreach (var size in new[] { 5, 10, 25, 50 })
+            {
+                <a href="@Url.Action("Index", new { searchTerm = ViewBag.CurrentSearch, major = ViewBag.CurrentMajor, pageNumber = 1, pageSize = size })" 
+                   class="btn @(size == paginationInfo.PageSize ? "btn-primary" : "btn-outline-primary")">@size</a>
+            }
+        </div>
+    </div>
+}
+
+<script>
+let bulkDeleteMode = false;
+
+function toggleBulkDelete() {
+    bulkDeleteMode = !bulkDeleteMode;
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    const studentIds = document.querySelectorAll('.student-id');
+    const selectAll = document.getElementById('selectAll');
+    const selectAllLabel = document.getElementById('selectAllLabel');
+    const normalHeader = document.getElementById('normalHeader');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    if (bulkDeleteMode) {
+        // Show checkboxes and hide IDs
+        checkboxes.forEach(cb => cb.style.display = 'inline');
+        studentIds.forEach(id => id.style.display = 'none');
+        selectAll.style.display = 'inline';
+        selectAllLabel.style.display = 'inline';
+        normalHeader.style.display = 'none';
+        bulkDeleteBtn.innerHTML = '<i class="fas fa-times"></i> لغو حذف گروهی';
+        bulkDeleteBtn.classList.remove('btn-outline-danger');
+        bulkDeleteBtn.classList.add('btn-secondary');
+    } else {
+        // Hide checkboxes and show IDs
+        checkboxes.forEach(cb => {
+            cb.style.display = 'none';
+            cb.checked = false;
+        });
+        studentIds.forEach(id => id.style.display = 'inline');
+        selectAll.style.display = 'none';
+        selectAll.checked = false;
+        selectAllLabel.style.display = 'none';
+        normalHeader.style.display = 'inline';
+        bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف انتخاب شده‌ها';
+        bulkDeleteBtn.classList.remove('btn-secondary');
+        bulkDeleteBtn.classList.add('btn-outline-danger');
+        bulkDeleteBtn.style.display = 'none';
+    }
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    updateBulkDeleteButton();
+}
+
+function updateBulkDeleteButton() {
+    const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    if (checkedBoxes.length > 0 && bulkDeleteMode) {
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.innerHTML = `<i class="fas fa-trash"></i> حذف ${checkedBoxes.length} دانشجو`;
+        bulkDeleteBtn.onclick = confirmBulkDelete;
+    } else if (bulkDeleteMode) {
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.innerHTML = '<i class="fas fa-times"></i> لغو حذف گروهی';
+        bulkDeleteBtn.onclick = toggleBulkDelete;
+    } else {
+        bulkDeleteBtn.style.display = 'none';
+    }
+}
+
+function confirmBulkDelete() {
+    const checkedBoxes = document.querySelectorAll('.student-checkbox:checked');
+    const studentIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+    
+    if (studentIds.length === 0) {
+        alert('هیچ دانشجویی انتخاب نشده است');
+        return;
+    }
+    
+    if (confirm(`آیا مطمئن هستید که می‌خواهید ${studentIds.length} دانشجو را حذف کنید؟`)) {
+        performBulkDelete(studentIds);
+    }
+}
+
+async function performBulkDelete(studentIds) {
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const originalText = bulkDeleteBtn.innerHTML;
+    
+    try {
+        bulkDeleteBtn.disabled = true;
+        bulkDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال حذف...';
+        
+        const response = await fetch('@Url.Action("BulkDelete")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({ studentIds: studentIds })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            location.reload(); // Refresh the page to show updated list
+        } else {
+            alert('خطا: ' + result.message);
+        }
+    } catch (error) {
+        alert('خطا در حذف دانشجویان: ' + error.message);
+    } finally {
+        bulkDeleteBtn.disabled = false;
+        bulkDeleteBtn.innerHTML = originalText;
+    }
+}
+
+// Add bulk delete toggle button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add bulk delete toggle button
+    const actionsDiv = document.querySelector('.d-flex.justify-content-between .div:first-child');
+    if (actionsDiv) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn btn-outline-warning me-2';
+        toggleBtn.innerHTML = '<i class="fas fa-check-square"></i> حذف گروهی';
+        toggleBtn.onclick = toggleBulkDelete;
+        
+        // Insert before the export dropdown
+        const exportDropdown = actionsDiv.querySelector('.btn-group');
+        actionsDiv.insertBefore(toggleBtn, exportDropdown);
+    }
+});
+
+// Show import errors if any
+@if (TempData["ImportErrors"] != null)
+{
+    var errors = TempData["ImportErrors"] as List<string>;
+    if (errors != null && errors.Any())
+    {
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorList = @Html.Raw(Json.Serialize(errors));
+            let errorMessage = 'خطاهای وارد کردن:\n\n';
+            errorList.forEach((error, index) => {
+                errorMessage += `${index + 1}. ${error}\n`;
+            });
+            alert(errorMessage);
+        });
+        </script>
+    }
+}
+</script>

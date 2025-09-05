@@ -1,0 +1,65 @@
+/* استایل‌های سفارشی برای سیستم مدیریت دانشجویان */
+
+html {
+  font-size: 14px;
+  position: relative;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin-bottom: 60px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+/* استایل‌های جدول */
+.table {
+  margin-top: 20px;
+}
+
+/* استایل‌های فرم */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* استایل‌های دکمه */
+.btn {
+  margin-right: 5px;
+}
+
+/* استایل‌های هدر */
+.navbar {
+  background-color: #f8f9fa;
+}
+
+/* استایل‌های کارت */
+.card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+/* استایل‌های صفحه اصلی */
+.jumbotron {
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  background-color: #e9ecef;
+  border-radius: 0.3rem;
+}

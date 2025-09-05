@@ -1,0 +1,40 @@
+@model StudentManagementAPI.DTOs.StudentDto
+
+@{
+    ViewData["Title"] = "حذف دانشجو";
+}
+
+<h1>حذف دانشجو</h1>
+
+<div class="alert alert-danger">
+    <h3>آیا از حذف این دانشجو اطمینان دارید؟</h3>
+</div>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">شناسه:</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+        
+        <dt class="col-sm-2">نام:</dt>
+        <dd class="col-sm-10">@Model.FirstName</dd>
+        
+        <dt class="col-sm-2">نام خانوادگی:</dt>
+        <dd class="col-sm-10">@Model.LastName</dd>
+        
+        <dt class="col-sm-2">شماره دانشجویی:</dt>
+        <dd class="col-sm-10">@Model.StudentNumber</dd>
+        
+        <dt class="col-sm-2">رشته تحصیلی:</dt>
+        <dd class="col-sm-10">@Model.Major</dd>
+        
+        <dt class="col-sm-2">سال ورود:</dt>
+        <dd class="col-sm-10">@Model.EnrollmentYear</dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="حذف" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">بازگشت به لیست</a>
+    </form>
+</div>

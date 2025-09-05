@@ -1,0 +1,279 @@
+@model StudentManagementAPI.DTOs.DashboardDto
+
+@{
+    ViewData["Title"] = "داشبورد";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="mb-4">
+                <i class="fas fa-chart-bar text-primary"></i>
+                داشبورد مدیریت دانشجویان
+            </h1>
+            <div>
+                <a href="@Url.Action("ExportDashboardToPdf")" class="btn btn-outline-danger">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    خروجی گزارش PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            کل دانشجویان
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalStudents</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            رشته‌های تحصیلی
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalMajors</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            دانشجویان امسال
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.StudentsThisYear</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            دانشجویان پارسال
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.StudentsLastYear</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-history fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- Major Distribution Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">توزیع دانشجویان بر اساس رشته</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="majorChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollment Trend Chart -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">روند ثبت‌نام سالانه</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="enrollmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Students and Major Statistics -->
+<div class="row">
+    <!-- Recent Students -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">آخرین دانشجویان ثبت‌نام شده</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>نام</th>
+                                <th>رشته</th>
+                                <th>تاریخ ثبت‌نام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var student in Model.RecentStudents)
+                            {
+                                <tr>
+                                    <td>@student.FirstName @student.LastName</td>
+                                    <td>@student.Major</td>
+                                    <td>@student.EnrollmentDate.ToString("yyyy/MM/dd")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Major Statistics -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">آمار رشته‌های تحصیلی</h6>
+            </div>
+            <div class="card-body">
+                @foreach (var major in Model.MajorStatistics.Take(5))
+                {
+                    <h4 class="small font-weight-bold">
+                        @major.Major 
+                        <span class="float-right">@major.Count دانشجو (@major.Percentage%)</span>
+                    </h4>
+                    <div class="progress mb-4">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: @major.Percentage%" 
+                             aria-valuenow="@major.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Major Distribution Chart
+        const majorCtx = document.getElementById('majorChart').getContext('2d');
+        const majorChart = new Chart(majorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.MajorStatistics.Select(m => $"'{m.Major}'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.MajorStatistics.Select(m => m.Count))],
+                    backgroundColor: [
+                        '#4e73df',
+                        '#1cc88a',
+                        '#36b9cc',
+                        '#f6c23e',
+                        '#e74a3b',
+                        '#858796',
+                        '#5a5c69'
+                    ],
+                    hoverBackgroundColor: [
+                        '#2e59d9',
+                        '#17a673',
+                        '#2c9faf',
+                        '#f4b619',
+                        '#e02d1b',
+                        '#6c757d',
+                        '#484848'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                cutoutPercentage: 80,
+            },
+        });
+
+        // Enrollment Trend Chart
+        const enrollmentCtx = document.getElementById('enrollmentChart').getContext('2d');
+        const enrollmentChart = new Chart(enrollmentCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.EnrollmentStatistics.Select(e => e.Year)))],
+                datasets: [{
+                    label: 'تعداد دانشجویان',
+                    data: [@string.Join(",", Model.EnrollmentStatistics.Select(e => e.Count))],
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+}

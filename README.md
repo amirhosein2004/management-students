@@ -246,7 +246,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 For support and questions:
 - 📧 Email: support@university.edu
-- 🐛 Issues: [GitHub Issues](https://github.com/your-repo/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/amirhosein2004/management-students)
 - 📖 Documentation: Available at `/swagger` endpoint
 
 **Made with ❤️ for educational purposes**

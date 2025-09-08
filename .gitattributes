@@ -1,0 +1,29 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Treat all files as binary (no automatic line ending conversion)
+# Uncomment the next line if you want this behavior
+# * binary
+
+# Specific settings for common file types
+*.js   text
+*.ts   text
+*.css  text
+*.html text
+*.json text
+*.md   text
+*.yml  text
+*.yaml text
+
+# Prevent Git from treating images as text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+
+# Prevent Git from treating archives as text
+*.zip binary
+*.tar binary
+*.gz  binary
+*.rar binary
